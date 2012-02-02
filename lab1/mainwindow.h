@@ -5,6 +5,8 @@
 #include <QMouseEvent>
 #include <QPaintDevice>
 #include <QPainter>
+#include <QColor>
+#include <QColorDialog>
 
 class MainWindow : public QMainWindow
 {
@@ -13,6 +15,8 @@ class MainWindow : public QMainWindow
     void paintEvent(QPaintEvent *);
     bool clicked;
     bool firstrun;
+    QColor color;
+    QColorDialog *dialog;
     int x1;
     int y1;
     int x2;

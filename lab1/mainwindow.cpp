@@ -3,23 +3,32 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       clicked(false),
-      firstrun(true)
+      firstrun(true),
+      color(Qt::black),
+      dialog(new QColorDialog(color, this))
 {
     this->setGeometry(QRect(0, 0, 1024, 600));
 }
 
 MainWindow::~MainWindow()
 {
+    delete dialog;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if (clicked)
+    if (event->button() == Qt::RightButton)
+    {
+        QColor newColor = dialog->getColor(color, this);
+        if (newColor.isValid())
+            color = newColor;
+    }
+    else if (clicked)
     {
         x2 = event->pos().x();
         y2 = event->pos().y();
         clicked = false;
-        this->update(); // CALL paintEVENT
+        this->repaint(); // CALL paintEVENT
     }
     else
     {
@@ -40,7 +49,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 
     QPainter painter(this);
-    painter.setPen(Qt::blue);
+    painter.setPen(color);
 
     int deltaX  = qAbs(x2 - x1);
     int deltaY  = qAbs(y2 - y1);
