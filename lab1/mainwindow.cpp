@@ -2,29 +2,29 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      clicked(false)
+      clicked(false),
+      firstrun(true)
 {
     this->setGeometry(QRect(0, 0, 1024, 600));
 }
 
 MainWindow::~MainWindow()
 {
-    
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (clicked)
     {
-        x2 = event->pos.x();
-        y2 = event->pos.y();
+        x2 = event->pos().x();
+        y2 = event->pos().y();
         clicked = false;
         this->update(); // CALL paintEVENT
     }
     else
     {
-        x1 = event->pos.x();
-        y1 = event->pos.y();
+        x1 = event->pos().x();
+        y1 = event->pos().y();
         clicked = true;
     }
 }
@@ -33,6 +33,11 @@ void MainWindow::paintEvent(QPaintEvent *event)
 {
     if (clicked)
         return;
+    if (firstrun)
+    {
+        firstrun = false;
+        return;
+    }
 
     QPainter painter(this);
     painter.setPen(Qt::blue);
@@ -54,14 +59,14 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
         if (error2 > -deltaY)
         {
-            error -= deltaY;
-            x1 += signX;
+            error   -= deltaY;
+            x1      += signX;
         }
 
         if (error2 < deltaX)
         {
-            error += deltaX;
-            y1 += signY;
+            error   += deltaX;
+            y1      += signY;
         }
     }
 }

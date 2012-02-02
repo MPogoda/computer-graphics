@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow
     void mousePressEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
     bool clicked;
+    bool firstrun;
     int x1;
     int y1;
     int x2;
