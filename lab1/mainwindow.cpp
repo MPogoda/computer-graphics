@@ -3,7 +3,6 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      clicked(false),
       color(Qt::black),
       pixmap(QPixmap(1024, 600)),
       dialog(new QColorDialog(color, this)),
@@ -12,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->setGeometry(QRect(0, 0, 1024, 600));
     label->setGeometry(this->geometry());
     pixmap.fill();
-    label->setPixmap(pixmap);
 }
 
 MainWindow::~MainWindow()
@@ -29,18 +27,25 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         if (newColor.isValid())
             color = newColor;
     }
-    else if (clicked)
-    {
-        p2 = event->pos();
-        clicked = false;
-        drawline(p1, p2);
-        label->setPixmap(pixmap);
-    }
-    else
+    else if (event->button() == Qt::LeftButton)
     {
         p1 = event->pos();
-        clicked = true;
     }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        p2 = event->pos();
+        drawline(p1, p2);
+        this->update();
+    }
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    label->setPixmap(pixmap);
 }
 
 void MainWindow::drawline(QPoint p1, QPoint p2)
@@ -79,13 +84,5 @@ void MainWindow::drawline(QPoint p1, QPoint p2)
             y1 += signY;
         }
     }
-
-}
-
-void MainWindow::paintEvent(QPaintEvent *event)
-{
-    if (clicked)
-        return;
-
 
 }

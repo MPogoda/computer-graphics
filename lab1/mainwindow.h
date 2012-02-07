@@ -14,10 +14,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
     void drawline(QPoint, QPoint);
 
-    bool         clicked;
     QColor       color;
     QPoint       p1;
     QPoint       p2;
