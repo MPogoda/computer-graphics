@@ -1,18 +1,24 @@
 #include "mainwindow.h"
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       clicked(false),
-      firstrun(true),
       color(Qt::black),
-      dialog(new QColorDialog(color, this))
+      pixmap(QPixmap(1024, 600)),
+      dialog(new QColorDialog(color, this)),
+      label(new QLabel(this))
 {
     this->setGeometry(QRect(0, 0, 1024, 600));
+    label->setGeometry(this->geometry());
+    pixmap.fill();
+    label->setPixmap(pixmap);
 }
 
 MainWindow::~MainWindow()
 {
     delete dialog;
+    delete label;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -25,37 +31,32 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     }
     else if (clicked)
     {
-        x2 = event->pos().x();
-        y2 = event->pos().y();
+        p2 = event->pos();
         clicked = false;
-        this->repaint(); // CALL paintEVENT
+        drawline(p1, p2);
+        label->setPixmap(pixmap);
     }
     else
     {
-        x1 = event->pos().x();
-        y1 = event->pos().y();
+        p1 = event->pos();
         clicked = true;
     }
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+void MainWindow::drawline(QPoint p1, QPoint p2)
 {
-    if (clicked)
-        return;
-    if (firstrun)
-    {
-        firstrun = false;
-        return;
-    }
-
-    QPainter painter(this);
+    QPainter painter(&pixmap);
     painter.setPen(color);
 
-    int deltaX  = qAbs(x2 - x1);
-    int deltaY  = qAbs(y2 - y1);
-    int signX   = (x1 < x2) ? 1 : -1;
-    int signY   = (y1 < y2) ? 1 : -1;
-    int error   = deltaX - deltaY;
+    int x1     = p1.x();
+    int y1     = p1.y();
+    int x2     = p2.x();
+    int y2     = p2.y();
+    int deltaX = qAbs(x2 - x1);
+    int deltaY = qAbs(y2 - y1);
+    int signX  = (x1 < x2) ? 1 : -1;
+    int signY  = (y1 < y2) ? 1 : -1;
+    int d      = deltaX - deltaY;
 
     for (;;)
     {
@@ -64,18 +65,27 @@ void MainWindow::paintEvent(QPaintEvent *event)
         if ((x1 == x2) && (y1 == y2))
             break;
 
-        int error2 = error << 1;
+        int d_next = d << 1;
 
-        if (error2 > -deltaY)
+        if (d_next > -deltaY)
         {
-            error   -= deltaY;
-            x1      += signX;
+            d  -= deltaY;
+            x1 += signX;
         }
 
-        if (error2 < deltaX)
+        if (d_next < deltaX)
         {
-            error   += deltaX;
-            y1      += signY;
+            d  += deltaX;
+            y1 += signY;
         }
     }
+
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    if (clicked)
+        return;
+
+
 }

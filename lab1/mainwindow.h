@@ -7,20 +7,23 @@
 #include <QPainter>
 #include <QColor>
 #include <QColorDialog>
+#include <QPixmap>
+#include <QLabel>
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
     void mousePressEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
-    bool clicked;
-    bool firstrun;
-    QColor color;
+    void drawline(QPoint, QPoint);
+
+    bool         clicked;
+    QColor       color;
+    QPoint       p1;
+    QPoint       p2;
+    QPixmap      pixmap;
     QColorDialog *dialog;
-    int x1;
-    int y1;
-    int x2;
-    int y2;
+    QLabel       *label;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
