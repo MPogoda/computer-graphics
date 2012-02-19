@@ -1,6 +1,6 @@
 *.user
-lab1-release
 moc_*
 *.o
 Makefile
-lab?
+lab?-*
+lab?/lab?

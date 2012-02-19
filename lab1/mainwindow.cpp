@@ -1,11 +1,10 @@
 #include "mainwindow.h"
-#include <QVBoxLayout>
+#include <QColorDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       color(Qt::black),
       pixmap(QPixmap(1024, 600)),
-      dialog(new QColorDialog(color, this)),
       label(new QLabel(this))
 {
     this->setGeometry(QRect(0, 0, 1024, 600));
@@ -15,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete dialog;
     delete label;
 }
 
@@ -23,7 +21,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton)
     {
-        QColor newColor = dialog->getColor(color, this);
+        QColor newColor = QColorDialog::getColor(color, this);
         if (newColor.isValid())
             color = newColor;
     }
@@ -37,8 +35,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        p2 = event->pos();
-        drawline(p1, p2);
+        drawline(p1, event->pos());
         this->update();
     }
 }
@@ -72,17 +69,16 @@ void MainWindow::drawline(QPoint p1, QPoint p2)
 
         int d_next = d << 1;
 
-        if (d_next > -deltaY)
-        {
-            d  -= deltaY;
-            x1 += signX;
-        }
-
         if (d_next < deltaX)
         {
             d  += deltaX;
             y1 += signY;
         }
-    }
 
+        if (d_next > -deltaY)
+        {
+            d  -= deltaY;
+            x1 += signX;
+        }
+    }
 }

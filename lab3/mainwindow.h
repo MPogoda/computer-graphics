@@ -15,12 +15,17 @@ class MainWindow : public QMainWindow
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
-    void drawline(QPoint, QPoint);
+    void mouseMoveEvent(QMouseEvent *);
+    void fill(QImage&, QPoint, QRgb);
 
-    QColor       color;
-    QPoint       p1;
-    QPixmap      pixmap;
-    QLabel       *label;
+    bool           clicked;
+    QColor         pencolor;
+    QColor         fillcolor;
+    QPoint         p1;
+    QPoint         p2;
+    QPixmap        pixmap;
+    QLabel         *label;
+    QPainter       *painter;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
