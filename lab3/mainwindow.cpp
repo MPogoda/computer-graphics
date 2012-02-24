@@ -1,12 +1,12 @@
 #include "mainwindow.h"
 #include <QColorDialog>
-#include <QStack>
+#include <QQueue>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       clicked(false),
-      pencolor(Qt::black),
-      fillcolor(Qt::red),
+      pencolour(Qt::black),
+      fillcolour(Qt::red),
       pixmap(QPixmap(1024, 600)),
       label(new QLabel(this)),
       painter(new QPainter(&pixmap))
@@ -26,16 +26,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton)
     {
-        QImage img = pixmap.toImage();
-        QColor newColor = QColorDialog::getColor(fillcolor, this);
-        if (newColor.isValid())
-            fillcolor = newColor;
+        // Ask about colour for filling
+        QColor newColour = QColorDialog::getColor(fillcolour, this);
+        if (newColour.isValid())
+            fillcolour = newColour;
         else
             return;
-        fill(img, event->pos(), fillcolor.rgb());
-        delete painter;
-        pixmap = QPixmap::fromImage(img);
-        painter = new QPainter(&pixmap);
+
+        fill(pixmap.toImage(), event->pos(), fillcolour.rgb());
         this->update();
 
     }
@@ -50,9 +48,10 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
     if (clicked)
     {
+        // Draw line between current and last known position
         p2 = event->pos();
 
-        painter->setPen(pencolor);
+        painter->setPen(pencolour);
         painter->drawLine(p1, p2);
 
         p1 = p2;
@@ -68,48 +67,69 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+void MainWindow::paintEvent(QPaintEvent *)
 {
     label->setPixmap(pixmap);
 }
 
-void MainWindow::fill(QImage& img, QPoint p, QRgb fillcolor)
+// Fill 4-way linked area, determined by colour of start point
+void MainWindow::fill(QImage img, QPoint p, QRgb fillcolour)
 {
-    const QRgb oldcolor = img.pixel(p);
+    const QRgb oldcolour = img.pixel(p);
 
-    if (oldcolor == fillcolor) return;
+    if (oldcolour == fillcolour) return;
+    painter->setPen(fillcolour);
 
-    QStack<QPoint> stack;
-    stack.push(p);
+    QQueue<QPoint> queue;
+    queue.enqueue(p);
 
-    while (!stack.isEmpty())
+    quint8 i = 0;
+    while (!queue.isEmpty())
     {
-        p = stack.pop();
-        img.setPixel(p, fillcolor);
+        if (!++i)
+            this->repaint();
+
+        p = queue.dequeue();
 
         if ((p.x() + 1) < img.width())
         {
-            QPoint tempPoint = QPoint(1, 0);
-            tempPoint += p;
-            if (img.pixel(tempPoint) == oldcolor) stack.push(tempPoint);
+            QPoint tempPoint = QPoint(1, 0) + p;
+            if (img.pixel(tempPoint) == oldcolour)
+            {
+                queue.enqueue(tempPoint);
+                img.setPixel(tempPoint, fillcolour);
+                painter->drawPoint(tempPoint);
+            }
         }
         if (p.x() > 0)
         {
-            QPoint tempPoint = QPoint(-1, 0);
-            tempPoint += p;
-            if (img.pixel(tempPoint) == oldcolor) stack.push(tempPoint);
+            QPoint tempPoint = QPoint(-1, 0) + p;
+            if (img.pixel(tempPoint) == oldcolour)
+            {
+                queue.enqueue(tempPoint);
+                img.setPixel(tempPoint, fillcolour);
+                painter->drawPoint(tempPoint);
+            }
         }
         if ((p.y() + 1) < img.height())
         {
-            QPoint tempPoint = QPoint(0, 1);
-            tempPoint += p;
-            if (img.pixel(tempPoint) == oldcolor) stack.push(tempPoint);
+            QPoint tempPoint = QPoint(0, 1) + p;
+            if (img.pixel(tempPoint) == oldcolour)
+            {
+                queue.enqueue(tempPoint);
+                img.setPixel(tempPoint, fillcolour);
+                painter->drawPoint(tempPoint);
+            }
         }
         if (p.y() > 0)
         {
-            QPoint tempPoint = QPoint(0, -1);
-            tempPoint += p;
-            if (img.pixel(tempPoint) == oldcolor) stack.push(tempPoint);
+            QPoint tempPoint = QPoint(0, -1) + p;
+            if (img.pixel(tempPoint) == oldcolour)
+            {
+                queue.enqueue(tempPoint);
+                img.setPixel(tempPoint, fillcolour);
+                painter->drawPoint(tempPoint);
+            }
         }
     }
 }

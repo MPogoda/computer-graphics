@@ -16,11 +16,11 @@ class MainWindow : public QMainWindow
     void mouseReleaseEvent(QMouseEvent *);
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
-    void fill(QImage&, QPoint, QRgb);
+    void fill(QImage, QPoint, QRgb);
 
     bool           clicked;
-    QColor         pencolor;
-    QColor         fillcolor;
+    const QColor   pencolour;
+    QColor         fillcolour;
     QPoint         p1;
     QPoint         p2;
     QPixmap        pixmap;

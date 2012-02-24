@@ -3,8 +3,9 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      color(Qt::black),
+      colour(Qt::black),
       pixmap(QPixmap(1024, 600)),
+      painter(new QPainter(&pixmap)),
       label(new QLabel(this))
 {
     this->setGeometry(QRect(0, 0, 1024, 600));
@@ -14,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    delete painter;
     delete label;
 }
 
@@ -21,13 +23,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton)
     {
-        QColor newColor = QColorDialog::getColor(color, this);
-        if (newColor.isValid())
-            color = newColor;
+        QColor newColour = QColorDialog::getColor(colour, this);
+        if (newColour.isValid())
+            colour = newColour;
     }
     else if (event->button() == Qt::LeftButton)
     {
-        p1 = event->pos();
+        firstpoint = event->pos();
     }
 }
 
@@ -35,20 +37,19 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        drawline(p1, event->pos());
+        drawline(firstpoint, event->pos());
         this->update();
     }
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+void MainWindow::paintEvent(QPaintEvent *)
 {
     label->setPixmap(pixmap);
 }
 
 void MainWindow::drawline(QPoint p1, QPoint p2)
 {
-    QPainter painter(&pixmap);
-    painter.setPen(color);
+    painter->setPen(colour);
 
     int x1     = p1.x();
     int y1     = p1.y();
@@ -62,7 +63,7 @@ void MainWindow::drawline(QPoint p1, QPoint p2)
 
     for (;;)
     {
-        painter.drawPoint(x1, y1);
+        painter->drawPoint(x1, y1);
 
         if ((x1 == x2) && (y1 == y2))
             break;

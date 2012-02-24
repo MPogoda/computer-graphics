@@ -17,10 +17,11 @@ class MainWindow : public QMainWindow
     void paintEvent(QPaintEvent *);
     void drawline(QPoint, QPoint);
 
-    QColor       color;
-    QPoint       p1;
-    QPixmap      pixmap;
-    QLabel       *label;
+    QColor   colour;
+    QPoint   firstpoint;
+    QPixmap  pixmap;
+    QPainter *painter;
+    QLabel   *label;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
