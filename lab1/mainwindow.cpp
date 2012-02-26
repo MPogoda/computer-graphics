@@ -1,22 +1,23 @@
 #include "mainwindow.h"
 #include <QColorDialog>
+#include <QApplication>
+#include <QDesktopWidget>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      colour(Qt::black),
-      pixmap(QPixmap(1024, 600)),
-      painter(new QPainter(&pixmap)),
-      label(new QLabel(this))
+    : QWidget(parent),
+      colour(Qt::black)
 {
-    this->setGeometry(QRect(0, 0, 1024, 600));
-    label->setGeometry(this->geometry());
+    this->setWindowState(Qt::WindowFullScreen);
+    this->setGeometry(QApplication::desktop()->geometry());
+
+    pixmap = QPixmap(this->size());
     pixmap.fill();
+    painter = new QPainter(&pixmap);
 }
 
 MainWindow::~MainWindow()
 {
     delete painter;
-    delete label;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -44,7 +45,8 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 
 void MainWindow::paintEvent(QPaintEvent *)
 {
-    label->setPixmap(pixmap);
+    QPainter painter(this);
+    painter.drawPixmap(this->geometry(), pixmap);
 }
 
 void MainWindow::drawline(QPoint p1, QPoint p2)

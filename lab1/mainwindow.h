@@ -1,15 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QWidget>
 #include <QMouseEvent>
 #include <QPaintDevice>
 #include <QPainter>
 #include <QColor>
 #include <QPixmap>
-#include <QLabel>
 
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
     void mousePressEvent(QMouseEvent *);
@@ -21,7 +20,6 @@ class MainWindow : public QMainWindow
     QPoint   firstpoint;
     QPixmap  pixmap;
     QPainter *painter;
-    QLabel   *label;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

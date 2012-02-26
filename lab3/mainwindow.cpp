@@ -1,25 +1,26 @@
 #include "mainwindow.h"
+#include <QApplication>
 #include <QColorDialog>
 #include <QQueue>
+#include <QDesktopWidget>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
+    : QWidget(parent, Qt::FramelessWindowHint),
       clicked(false),
       pencolour(Qt::black),
-      fillcolour(Qt::red),
-      pixmap(QPixmap(1024, 600)),
-      label(new QLabel(this)),
-      painter(new QPainter(&pixmap))
+      fillcolour(Qt::red)
 {
-    this->setGeometry(QRect(0, 0, 1024, 600));
-    label->setGeometry(this->geometry());
+    this->setWindowState(Qt::WindowFullScreen);
+    this->setGeometry(QApplication::desktop()->geometry());
+
+    pixmap = QPixmap(this->size());
     pixmap.fill();
+    painter = new QPainter(&pixmap);
 }
 
 MainWindow::~MainWindow()
 {
     delete painter;
-    delete label;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -69,7 +70,8 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 
 void MainWindow::paintEvent(QPaintEvent *)
 {
-    label->setPixmap(pixmap);
+    QPainter painter(this);
+    painter.drawPixmap(this->geometry(), pixmap);
 }
 
 // Fill 4-way linked area, determined by colour of start point
@@ -86,11 +88,13 @@ void MainWindow::fill(QImage img, QPoint p, QRgb fillcolour)
     quint8 i = 0;
     while (!queue.isEmpty())
     {
+        // every 256 iterations draw changes
         if (!++i)
             this->repaint();
 
         p = queue.dequeue();
 
+        // Try to move right
         if ((p.x() + 1) < img.width())
         {
             QPoint tempPoint = QPoint(1, 0) + p;
@@ -101,6 +105,7 @@ void MainWindow::fill(QImage img, QPoint p, QRgb fillcolour)
                 painter->drawPoint(tempPoint);
             }
         }
+        // Try to move left
         if (p.x() > 0)
         {
             QPoint tempPoint = QPoint(-1, 0) + p;
@@ -111,6 +116,7 @@ void MainWindow::fill(QImage img, QPoint p, QRgb fillcolour)
                 painter->drawPoint(tempPoint);
             }
         }
+        // Try to move up
         if ((p.y() + 1) < img.height())
         {
             QPoint tempPoint = QPoint(0, 1) + p;
@@ -121,6 +127,7 @@ void MainWindow::fill(QImage img, QPoint p, QRgb fillcolour)
                 painter->drawPoint(tempPoint);
             }
         }
+        // Try to move down
         if (p.y() > 0)
         {
             QPoint tempPoint = QPoint(0, -1) + p;
