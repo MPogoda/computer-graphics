@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDesktopWidget>
-#include <QDebug>
 #include <qmath.h>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -16,14 +15,16 @@ MainWindow::MainWindow(QWidget *parent) :
     bgcolour(Qt::white)
 {
     ui->setupUi(this);
-    this->setWindowState(Qt::WindowFullScreen);
+
     this->setGeometry(QApplication::desktop()->geometry());
+    this->setWindowState(Qt::WindowFullScreen);
+
     buttons->addButton(ui->button1, 1);
     buttons->addButton(ui->button2, 2);
     buttons->addButton(ui->button3, 3);
     buttons->addButton(ui->button4, 4);
-    ui->groupBox->setEnabled(false);
     connect(buttons, SIGNAL(buttonClicked(int)), this, SLOT(buttons_click(int)));
+    ui->groupBox->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -137,6 +138,10 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
                 points[i] = mul(points[i]);
                 points[i] += real_origin;
             }
+            break;
+        case SELECTING:
+            //wtf
+            break;
         }
         origin = current;
         drawTriangle(points, fgcolour);
@@ -153,7 +158,7 @@ void MainWindow::drawTriangle(const QPointF *points, const QColor& colour)
     this->update();
 }
 
-QPointF MainWindow::mul(const QPointF& point)
+QPointF MainWindow::mul(const QPointF& point) const
 {
     static qreal vector[3];
     static qreal sum[3];

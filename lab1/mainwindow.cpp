@@ -7,8 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent),
       colour(Qt::black)
 {
-    this->setWindowState(Qt::WindowFullScreen);
     this->setGeometry(QApplication::desktop()->geometry());
+    this->setWindowState(Qt::WindowFullScreen);
 
     pixmap = QPixmap(this->size());
     pixmap.fill();
