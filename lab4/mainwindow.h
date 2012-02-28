@@ -32,7 +32,6 @@ private:
     quint8          points_stored;
     QPointF         origin;
     QPointF         real_origin;
-    qreal           matrix[3][3];
     const QColor    fgcolour;
     const QColor    bgcolour;
 
@@ -41,7 +40,6 @@ private:
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void drawTriangle(const QPointF*, const QColor &);
-    QPointF mul(const QPointF&) const;
 private slots:
     void buttons_click(int);
 };

@@ -103,46 +103,39 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
     if ((state != SELECTING) && mouse_clicked)
     {
         drawTriangle(points, bgcolour);
-        const QPointF current = event->pos();
+        const QPointF current    = event->pos();
         const QPointF difference = current - origin;
 
-        for (qint8 i = 0; i < 3; ++i)
-            for (qint8 j = 0; j < 2; ++j)
-                matrix[i][j] = 0.0;
-        matrix[2][2] = 1.0;
-
-        switch (state)
+        if (state == MOVING)
         {
-        case MOVING:
             for (qint8 i = 0; i < 3; ++i)
+            {
                 points[i] += difference;
-            break;
-        case SCALING:
-            matrix[0][0] = 1.0 + difference.x() / 200.0;
-            matrix[1][1] = 1.0 - difference.y() / 200.0;
-            for (qint8 i = 0; i < 3; ++i)
-            {
-                points[i] -= real_origin;
-                points[i] = mul(points[i]);
-                points[i] += real_origin;
             }
-            break;
-        case ROTATING:
-            matrix[0][0] = qCos(difference.x() / 50.0);
-            matrix[1][1] = qCos(difference.x() / 50.0);
-            matrix[0][1] = qSin(difference.x() / 50.0);
-            matrix[1][0] = -qSin(difference.x() / 50.0);
-            for (qint8 i = 0; i < 3; ++i)
-            {
-                points[i] -= real_origin;
-                points[i] = mul(points[i]);
-                points[i] += real_origin;
-            }
-            break;
-        case SELECTING:
-            //wtf
-            break;
         }
+        else if (state == SCALING)
+        {
+            for (qint8 i = 0; i < 3; ++i)
+            {
+                points[i] -= real_origin;
+                points[i].rx() *= 1.0 + difference.x() / 200.0;
+                points[i].ry() *= 1.0 - difference.y() / 200.0;
+                points[i] += real_origin;
+            }
+        }
+        else
+        {
+            const qreal cosinus = qCos(difference.x() / 50.0);
+            const qreal sinus   = qSin(difference.x() / 50.0);
+            for (qint8 i = 0; i < 3; ++i)
+            {
+                points[i] -= real_origin;
+                points[i] = QPointF(points[i].x() * cosinus - points[i].y() * sinus,
+                                    points[i].x() * sinus + points[i].y() * cosinus);
+                points[i] += real_origin;
+            }
+        }
+
         origin = current;
         drawTriangle(points, fgcolour);
     }
@@ -156,22 +149,4 @@ void MainWindow::drawTriangle(const QPointF *points, const QColor& colour)
     painter->drawLine(points[2], points[0]);
 
     this->update();
-}
-
-QPointF MainWindow::mul(const QPointF& point) const
-{
-    static qreal vector[3];
-    static qreal sum[3];
-    vector[0] = point.x();
-    vector[1] = point.y();
-    vector[2] = 1.0;
-
-    for (qint8 i = 0; i < 3; ++i)
-    {
-        sum[i] = 0.0;
-        for (quint8 j = 0; j < 3; ++j)
-            sum[i] += vector[j] * matrix[j][i];
-    }
-
-    return QPointF(sum[0], sum[1]);
 }
