@@ -13,9 +13,10 @@ Flood-fill area with same colour. [Flood fill](http://en.wikipedia.org/wiki/Floo
 ## Lab4
 
 Draw a triangle and perform basic transformations on it:
-  * Moving
-  * Scaling
-  * Rotating
+
+* Moving
+* Scaling
+* Rotating
 
 ### License
 Copyright (c) 2012 Pogoda M.V.
