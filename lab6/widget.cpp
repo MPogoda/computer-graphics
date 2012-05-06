@@ -1,6 +1,8 @@
 #include "widget.h"
 #include <QApplication>
 #include <QDesktopWidget>
+#include <qmath.h>
+#include <QDebug>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent),
@@ -57,11 +59,25 @@ const QPolygon& Widget::do_proection(const QVector<QVector3D> &ps) const
 
 void Widget::draw_figure()
 {
+    if (origin.x() >= 100)
+    {
+        draw_face(QVector<QVector3D>(0) << points[0] << points[1] << points[6] << points[7]); // right
+    }
+    else if (origin.x() <= -100)
+    {
+        draw_face(QVector<QVector3D>(0) << points[2] << points[3] << points[4] << points[5]); // left
+    }
+
+    if (origin.y() >= 80)
+    {
+        draw_face(QVector<QVector3D>(0) << points[0] << points[3] << points[4] << points[7]); // top
+    }
+    else if (origin.y() <= -80)
+    {
+        draw_face(QVector<QVector3D>(0) << points[1] << points[2] << points[5] << points[6]); // bottom
+    }
+
     draw_face(QVector<QVector3D>(0) << points[0] << points[1] << points[2] << points[3]);
-    draw_face(QVector<QVector3D>(0) << points[0] << points[1] << points[6] << points[7]);
-    draw_face(QVector<QVector3D>(0) << points[1] << points[2] << points[5] << points[6]);
-    draw_face(QVector<QVector3D>(0) << points[2] << points[3] << points[4] << points[5]);
-    draw_face(QVector<QVector3D>(0) << points[0] << points[3] << points[4] << points[7]);
 
     painter->drawText(900, 0, 124, 20, 0,
                       "(" + QString::number(origin.x()) + ", "
@@ -71,10 +87,33 @@ void Widget::draw_figure()
     this->update();
 }
 
+qreal Widget::calculate_l(const QVector<QVector3D> &ps) const
+{
+    static QVector3D n;
+    static QVector3D d;
+
+    n.setX( (ps.at(0).y() - ps.at(2).y()) * (ps.at(1).z() - ps.at(2).z()) -
+            (ps.at(0).z() - ps.at(2).z()) * (ps.at(1).y() - ps.at(2).y()) );
+    n.setY( (ps.at(0).z() - ps.at(2).z()) * (ps.at(1).x() - ps.at(2).x()) -
+            (ps.at(0).x() - ps.at(2).x()) * (ps.at(1).z() - ps.at(2).z()) );
+    n.setZ( (ps.at(0).x() - ps.at(2).x()) * (ps.at(1).y() - ps.at(2).y()) -
+            (ps.at(0).y() - ps.at(2).y()) * (ps.at(1).x() - ps.at(2).x()) );
+    n.normalize();
+
+    d.setX( 0.5 * (ps.at(0).x() + ps.at(2).x() + origin.x()));
+    d.setY( 0.5 * (ps.at(0).y() + ps.at(2).y() + origin.y()));
+    d.setZ( 0.5 * (ps.at(0).z() + ps.at(2).z() + z));
+    d.normalize();
+
+    return n.x() * d.x() + n.y() * d.y() + n.z() * d.z();
+}
+
 void Widget::draw_face(const QVector<QVector3D> &ps)
 {
     const QPolygon& proected_points = do_proection(ps);
 
+    quint32 t = qAbs(255 * calculate_l(ps));
+    painter->setBrush(QBrush(QColor(t)));
     painter->drawPolygon(proected_points);
 }
 

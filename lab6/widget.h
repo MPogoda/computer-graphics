@@ -25,6 +25,7 @@ class Widget : public QWidget
     const QPolygon& do_proection(const QVector<QVector3D>& ps) const;
     void draw_figure();
     void draw_face(const QVector<QVector3D>& ps);
+    qreal calculate_l(const QVector<QVector3D>& ps) const;
 
     const static quint8 NUMBER_OF_VERTEX = 8;
 
