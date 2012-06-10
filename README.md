@@ -6,6 +6,10 @@ Some simple programs that i've made.
 
 Draw line between two points using [Bresenham's line algorithm](http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
 
+## Lab2
+
+Draw cyclic [Bézier_curve](http://en.wikipedia.org/wiki/Bézier_curve).
+
 ## Lab3
 
 Flood-fill area with same colour. [Flood fill](http://en.wikipedia.org/wiki/Flood_fill).
@@ -14,9 +18,18 @@ Flood-fill area with same colour. [Flood fill](http://en.wikipedia.org/wiki/Floo
 
 Draw a triangle and perform basic transformations on it:
 
+
 * Moving
 * Scaling
 * Rotating
+
+## Lab5
+
+Draw a 2D rendering of 3D object (cube).
+
+## Lab6
+
+Do a surface filling of cube's faces from Lab5.
 
 ### License
 Copyright (c) 2012 Pogoda M.V.
